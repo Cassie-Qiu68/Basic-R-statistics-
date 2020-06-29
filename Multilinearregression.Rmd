@@ -1,0 +1,42 @@
+---
+title: "OLS"
+author: "SijingQiu"
+date: "2020/6/29"
+output: html_document
+---
+解决循环进行多元线性回归问题
+
+```{r 循环多元线性回归}
+library(readxl)
+rm(list=ls())
+###设置工作目录, 也可以通过工具栏Session/Set Working Directory
+setwd ("C:/Users/Lenovo/Desktop/Submission/Tables") 
+
+###读取数据
+Production <- read_excel("Grain production_1991_2015.xls",
+                         sheet ="sort2")
+Areaslope25 <- read_excel("Cropland_slope_yield calculation.xlsx",
+                          sheet = ">25°")
+
+Areaslope15_25 <- read_excel("Cropland_slope_yield calculation.xlsx",
+                          sheet = "15-25°")
+Areaslope15 <- read_excel("Cropland_slope_yield calculation.xlsx",
+                          sheet = "<15°")
+###转为数据框
+y <- as.data.frame(Production[3:27])
+x1 <- as.data.frame(Areaslope15[3:27])
+x2 <- as.data.frame(Areaslope15_25[3:27])
+x3 <- as.data.frame(Areaslope25[3:27])
+
+###循环线性回归
+result <-c() 
+for (i in 1:82){
+  fit <- lm(unlist(y[i,]) ~ unlist(x1[i,])+unlist(x2[i,])+unlist(x3[i,])) #逐行读取表格数据
+  result <- rbind(result, #rbind用于纵向合并
+                  c(coef(summary(fit))))
+}
+
+write.csv(result,file="multilineregression.csv")
+
+```
+
